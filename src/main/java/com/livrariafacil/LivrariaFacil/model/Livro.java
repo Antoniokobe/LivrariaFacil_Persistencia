@@ -29,12 +29,12 @@ public class Livro {
 
     @NotNull(message = "Preço de custo é obrigatório.")
     @DecimalMin(value = "0.01", message = "Preço de custo deve ser maior que zero.")
-    @Column(name = "preco_custo", nullable = false, precision = 10, scale = 2)
+    @Column(name = "precocusto", nullable = false, precision = 10, scale = 2)
     private BigDecimal precoCusto;
 
     @NotNull(message = "Preço de venda é obrigatório.")
     @DecimalMin(value = "0.01", message = "Preço de venda deve ser maior que zero.")
-    @Column(name = "preco_venda", nullable = false, precision = 10, scale = 2)
+    @Column(name = "precovenda", nullable = false, precision = 10, scale = 2)
     private BigDecimal precoVenda;
 
     @Min(value = 0, message = "Estoque não pode ser negativo.")

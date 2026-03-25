@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venda - Livraria Fácil</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/validacoes.js" defer></script>
+</head>
+<body>
+    <header>
+        <div class="logo">📚 Livraria Fácil</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="clientes.html">Clientes</a></li>
+                <li><a href="livros.html">Livros</a></li>
+                <li><a href="venda.html">Venda</a></li>
+                <li><a href="historico.html">Histórico</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+
+            <div class="pagina-titulo">
+                <h2>Vendas</h2>
+            </div>
+
+            <div id="alertaVenda" class="alerta"></div>
+
+            <!-- 1. SELECIONAR CLIENTE -->
+            <div class="card-form">
+                <h3>1. Selecionar Cliente</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cliente *</label>
+                        <select id="selectCliente" name="selectCliente">
+                            <option value="">Selecione um cliente</option>
+                        </select>
+                        <span id="erro-selectCliente" class="erro-msg"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. DADOS PESSOAIS -->
+            <div class="card-form">
+                <h3>2. Dados Pessoais</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome completo</label>
+                        <input id="nomeVenda" name="nomeVenda" type="text"
+                               placeholder="Nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label>CPF</label>
+                        <input id="cpfVenda" name="cpfVenda" type="text"
+                               placeholder="CPF">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input id="emailVenda" name="emailVenda" type="email"
+                               placeholder="e-mail">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input id="telefoneVenda" name="telefoneVenda" type="tel"
+                               placeholder="telefone">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. ADICIONAR LIVROS -->
+            <div class="card-form">
+                <h3>3. Adicionar Livros ao Carrinho</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Livro *</label>
+                        <select id="selectLivro" name="selectLivro">
+                            <option value="">Selecione um livro</option>
+                        </select>
+                        <span id="erro-selectLivro" class="erro-msg"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantidade *</label>
+                        <input id="qtdLivro" name="qtdLivro" type="number"
+                               placeholder="Quantidade" min="1" value="1">
+                        <span id="erro-qtdLivro" class="erro-msg"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button class="btn btn-primario" type="button" id="btnAdicionarLivro">Adicionar</button>
+                    </div>
+                </div>
+
+                <!-- CARRINHO -->
+                <div class="carrinho">
+                    <h4>🛒 Carrinho (<span id="qtdItensCarrinho">0</span> item(s))</h4>
+                    <div id="listaCarrinho">
+                        <p class="tabela-vazia">Nenhum item adicionado.</p>
+                    </div>
+                    <p>Total: <strong id="totalCarrinho">R$ 0,00</strong></p>
+                </div>
+
+                <div class="acoes-form">
+                    <button class="btn btn-secundario" type="button" id="btnCancelarVenda">Cancelar</button>
+                    <button class="btn btn-primario" type="button" id="btnFinalizarVenda">Finalizar Venda</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+</html>

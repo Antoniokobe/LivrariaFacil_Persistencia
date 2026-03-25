@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - Livraria Fácil</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/validacoes.js" defer></script>
+</head>
+<body>
+    <header>
+        <div class="logo">📚 Livraria Fácil</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="livros.html">Livros</a></li>
+                <li><a href="clientes.html">Clientes</a></li>
+                <li><a href="venda.html">Venda</a></li>
+                <li><a href="historico.html">Histórico</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+
+            <div class="pagina-titulo">
+                <h2>Clientes</h2>
+            </div>
+
+            <div class="card-form">
+                <h3>+ Cadastrar Cliente</h3>
+
+                <form id="formCliente">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nome Completo</label>
+                            <input id="nomeCliente" name="nomeCliente" type="text"
+                                   placeholder="Digite o nome completo">
+                        </div>
+                        <div class="form-group">
+                            <label>CPF *</label>
+                            <input id="cpfCliente" name="cpfCliente" type="text"
+                                   placeholder="000.000.000-00">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>E-mail</label>
+                            <input id="emailCliente" name="emailCliente" type="email"
+                                   placeholder="exemplo@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone</label>
+                            <input id="telefoneCliente" name="telefoneCliente" type="tel"
+                                   placeholder="(00) 00000-0000">
+                        </div>
+                    </div>
+
+                    <div class="acoes-form">
+                        <button class="btn btn-primario" type="submit">Salvar</button>
+                        <button class="btn btn-secundario" type="button" id="btnLimparCliente">Limpar</button>
+                    </div>
+
+                    <p id="msgCliente"></p>
+                </form>
+            </div>
+
+            <div class="card-tabela">
+                <h3>Clientes Cadastrados</h3>
+                <table id="tabelaClientes">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>E-mail</th>
+                            <th>Telefone</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="tabela-vazia">
+                            <td colspan="5">Nenhum cliente cadastrado.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+</body>
+</html>

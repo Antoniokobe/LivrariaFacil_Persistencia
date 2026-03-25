@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico - Livraria Fácil</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/validacoes.js" defer></script>
+</head>
+<body>
+    <header>
+        <div class="logo">📚 Livraria Fácil</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="livros.html">Livros</a></li>
+                <li><a href="clientes.html">Clientes</a></li>
+                <li><a href="venda.html">Venda</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <div class="pagina-titulo">
+            <h2>Histórico de Vendas</h2>
+        </div>
+        
+        <div class="card-tabela">
+            <h3>Vendas Realizadas</h3>
+            
+            <div class="filtros-historico">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Data Início</label>
+                        <input id="filtroDataInicio" type="date">
+                    </div>
+                    <div class="form-group">
+                        <label>Data Fim</label>
+                        <input id="filtroDataFim" type="date">
+                    </div>
+                </div>
+            </div>
+            
+            <table id="tabelaHistorico">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Data</th>
+                        <th>Itens</th>
+                        <th>Total</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="tabela-vazia">
+                        <td colspan="5">Nenhum registro encontrado.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

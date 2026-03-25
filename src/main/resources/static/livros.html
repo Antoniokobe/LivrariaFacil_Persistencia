@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livros - Livraria Fácil</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/validacoes.js" defer></script>
+</head>
+<body>
+    <header>
+        <div class="logo">📚 Livraria Fácil</div>
+        <nav>
+            <ul>
+                ><a href="index.html">Home</a></li>
+                ><a href="clientes.html">Clientes</a></li>
+                ><a href="venda.html">Venda</a></li>
+                ><a href="historico.html">Histórico</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+
+            <div class="pagina-titulo">
+                <h2>Livros</h2>
+            </div>
+
+            <div id="alertaLivro" class="alerta"></div>
+
+            <div class="card-form">
+                <h3>+ Cadastrar Livro</h3>
+
+                <form id="formLivro">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>ISBN *</label>
+                            <input id="isbn" name="isbn" type="text" placeholder="ISBN *">
+                            <span id="erro-isbn" class="erro-msg"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Título *</label>
+                            <input id="titulo" name="titulo" type="text" placeholder="Título">
+                            <span id="erro-titulo" class="erro-msg"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Autor *</label>
+                            <input id="autor" name="autor" type="text" placeholder="Autor">
+                            <span id="erro-autor" class="erro-msg"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <input id="categoria" name="categoria" type="text" placeholder="Categoria">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Preço de Custo *</label>
+                            <input id="precoCusto" name="precoCusto" type="number"
+                                   placeholder="0.00" min="0" step="0.01">
+                            <span id="erro-precoCusto" class="erro-msg"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Preço de Venda *</label>
+                            <input id="precoVenda" name="precoVenda" type="number"
+                                   placeholder="0.00" min="0" step="0.01">
+                            <span id="erro-precoVenda" class="erro-msg"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Estoque *</label>
+                            <input id="estoque" name="estoque" type="number"
+                                   placeholder="0" min="0">
+                            <span id="erro-estoque" class="erro-msg"></span>
+                        </div>
+                    </div>
+
+                    <div class="acoes-form">
+                        <button class="btn btn-primario" type="submit">Salvar</button>
+                        <button class="btn btn-secundario" type="button" id="btnLimparLivro">Limpar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-tabela">
+                <h3>Livros Cadastrados</h3>
+                <table id="tabelaLivros">
+                    <thead>
+                        <tr>
+                            <th>ISBN</th>
+                            <th>TÍTULO</th>
+                            <th>AUTOR</th>
+                            <th>CATEGORIA</th>
+                            <th>PREÇO</th>
+                            <th>ESTOQUE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="tabela-vazia">
+                            <td colspan="6">Nenhum livro cadastrado.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+</body>
+</html>

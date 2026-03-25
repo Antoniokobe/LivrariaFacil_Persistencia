@@ -12,11 +12,11 @@ public class ItemVenda {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "venda_id", nullable = false)
+    @JoinColumn(name = "vendaid", nullable = false)
     private Venda venda;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "livro_id", nullable = false)
+    @JoinColumn(name = "livroid", nullable = false)
     private Livro livro;
 
     @Column(nullable = false)

@@ -1,7 +1,9 @@
-﻿// ========================================
-// validacoes.js — Livraria Fácil
-// Validações e funcionalidades dinâmicas
 // ========================================
+// validacoes.js - Livraria Fácil
+// Validações e funcionalidades dinâmicas com integração API REST
+// ========================================
+
+const API_BASE_URL = '/api';
 
 // ---------- UTILITÁRIOS ----------
 
@@ -35,8 +37,8 @@ function formatarMoeda(valor) {
 }
 
 function validarCPF(cpf) {
-    cpf = cpf.replace(/[\D]/g, '');
-    if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+    cpf = cpf.replace(/[\\D]/g, '');
+    if (cpf.length !== 11 || /^(\\d)\\1+$/.test(cpf)) return false;
     let soma = 0;
     for (let i = 0; i < 9; i++) soma += parseInt(cpf[i]) * (10 - i);
     let d1 = (soma * 10) % 11;
@@ -50,21 +52,21 @@ function validarCPF(cpf) {
 }
 
 function mascaraCPF(input) {
-    let v = input.value.replace(/\D/g, '');
-    v = v.replace(/(\d{3})(\d)/, '$1.$2');
-    v = v.replace(/(\d{3})(\d)/, '$1.$2');
-    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    let v = input.value.replace(/\\D/g, '');
+    v = v.replace(/(\\d{3})(\\d)/, '$1.$2');
+    v = v.replace(/(\\d{3})(\\d)/, '$1.$2');
+    v = v.replace(/(\\d{3})(\\d{1,2})$/, '$1-$2');
     input.value = v;
 }
 
 function mascaraTelefone(input) {
-    let v = input.value.replace(/\D/g, '');
+    let v = input.value.replace(/\\D/g, '');
     if (v.length <= 10) {
-        v = v.replace(/(\d{2})(\d)/, '($1) $2');
-        v = v.replace(/(\d{4})(\d)/, '$1-$2');
+        v = v.replace(/(\\d{2})(\\d)/, '($1) $2');
+        v = v.replace(/(\\d{4})(\\d)/, '$1-$2');
     } else {
-        v = v.replace(/(\d{2})(\d)/, '($1) $2');
-        v = v.replace(/(\d{5})(\d)/, '$1-$2');
+        v = v.replace(/(\\d{2})(\\d)/, '($1) $2');
+        v = v.replace(/(\\d{5})(\\d)/, '$1-$2');
     }
     input.value = v;
 }
@@ -78,25 +80,54 @@ document.addEventListener('DOMContentLoaded', function () {
     // ==============================
     const formLivro = document.getElementById('formLivro');
     if (formLivro) {
-
         const btnLimparLivro = document.getElementById('btnLimparLivro');
+
+        // Carrega livros do banco ao iniciar
+        function carregarLivrosTabela() {
+            fetch(`${API_BASE_URL}/livros`)
+                .then(response => response.json())
+                .then(livros => {
+                    const tbody = document.querySelector('#tabelaLivros tbody');
+                    tbody.innerHTML = '';
+                    if (livros.length === 0) {
+                        tbody.innerHTML = '<tr class="tabela-vazia"><td colspan="6">Nenhum livro cadastrado.</td></tr>';
+                        return;
+                    }
+                    livros.forEach(livro => {
+                        const linha = document.createElement('tr');
+                        linha.innerHTML = `
+                            <td>${livro.isbn}</td>
+                            <td>${livro.titulo}</td>
+                            <td>${livro.autor}</td>
+                            <td>${livro.categoria || ''}</td>
+                            <td>${formatarMoeda(livro.precoVenda)}</td>
+                            <td>${livro.estoque}</td>
+                        `;
+                        tbody.appendChild(linha);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar livros:', error);
+                    mostrarAlerta('alertaLivro', 'erro', 'Erro ao carregar livros do banco de dados.');
+                });
+        }
+
+        carregarLivrosTabela();
 
         formLivro.addEventListener('submit', function (e) {
             e.preventDefault();
-
             const campos = ['isbn', 'titulo', 'autor', 'precoCusto', 'precoVenda', 'estoque'];
             campos.forEach(id => limparErro(id));
 
-            const isbn       = document.getElementById('isbn').value.trim();
-            const titulo     = document.getElementById('titulo').value.trim();
-            const autor      = document.getElementById('autor').value.trim();
-            const categoria  = document.getElementById('categoria').value.trim();
+            const isbn = document.getElementById('isbn').value.trim();
+            const titulo = document.getElementById('titulo').value.trim();
+            const autor = document.getElementById('autor').value.trim();
+            const categoria = document.getElementById('categoria').value.trim();
             const precoCusto = parseFloat(document.getElementById('precoCusto').value);
             const precoVenda = parseFloat(document.getElementById('precoVenda').value);
-            const estoque    = parseInt(document.getElementById('estoque').value);
+            const estoque = parseInt(document.getElementById('estoque').value);
 
             let valido = true;
-
             if (!isbn) { mostrarErro('isbn', 'ISBN é obrigatório.'); valido = false; }
             if (!titulo) { mostrarErro('titulo', 'Título é obrigatório.'); valido = false; }
             if (!autor) { mostrarErro('autor', 'Autor é obrigatório.'); valido = false; }
@@ -112,30 +143,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!valido) return;
 
-            // Adiciona na tabela
-            const tbody = document.querySelector('#tabelaLivros tbody');
-            const vazia = tbody.querySelector('.tabela-vazia');
-            if (vazia) vazia.remove();
-
-            const linha = document.createElement('tr');
-            linha.innerHTML = `
-                <td>${isbn}</td>
-                <td>${titulo}</td>
-                <td>${autor}</td>
-                <td>${categoria}</td>
-                <td>${formatarMoeda(precoVenda)}</td>
-                <td>${estoque}</td>
-            `;
-            tbody.appendChild(linha);
-
-            // Salva no localStorage
             const livro = { isbn, titulo, autor, categoria, precoCusto, precoVenda, estoque };
-            const livros = JSON.parse(localStorage.getItem('livros') || '[]');
-            livros.push(livro);
-            localStorage.setItem('livros', JSON.stringify(livros));
 
-            mostrarAlerta('alertaLivro', 'sucesso', 'Livro cadastrado com sucesso!');
-            formLivro.reset();
+            fetch(`${API_BASE_URL}/livros`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(livro)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then(data => {
+                mostrarAlerta('alertaLivro', 'sucesso', 'Livro cadastrado com sucesso!');
+                formLivro.reset();
+                carregarLivrosTabela();
+            })
+            .catch(error => {
+                console.error('Erro ao cadastrar livro:', error);
+                mostrarAlerta('alertaLivro', 'erro', 'Erro ao cadastrar livro: ' + (error.message || 'Erro desconhecido'));
+            });
         });
 
         if (btnLimparLivro) {
@@ -151,35 +180,59 @@ document.addEventListener('DOMContentLoaded', function () {
     // ==============================
     const formCliente = document.getElementById('formCliente');
     if (formCliente) {
-
         const btnLimparCliente = document.getElementById('btnLimparCliente');
-        const msgCliente       = document.getElementById('msgCliente');
-
-        const cpfInput      = document.getElementById('cpfCliente');
+        const msgCliente = document.getElementById('msgCliente');
+        const cpfInput = document.getElementById('cpfCliente');
         const telefoneInput = document.getElementById('telefoneCliente');
 
-        if (cpfInput)      cpfInput.addEventListener('input', () => mascaraCPF(cpfInput));
+        if (cpfInput) cpfInput.addEventListener('input', () => mascaraCPF(cpfInput));
         if (telefoneInput) telefoneInput.addEventListener('input', () => mascaraTelefone(telefoneInput));
+
+        // Carrega clientes do banco ao iniciar
+        function carregarClientesTabela() {
+            fetch(`${API_BASE_URL}/clientes`)
+                .then(response => response.json())
+                .then(clientes => {
+                    const tbody = document.querySelector('#tabelaClientes tbody');
+                    tbody.innerHTML = '';
+                    if (clientes.length === 0) {
+                        tbody.innerHTML = '<tr class="tabela-vazia"><td colspan="5">Nenhum cliente cadastrado.</td></tr>';
+                        return;
+                    }
+                    clientes.forEach(cliente => {
+                        const linha = document.createElement('tr');
+                        linha.innerHTML = `
+                            <td>${cliente.nomeCompleto}</td>
+                            <td>${cliente.cpf}</td>
+                            <td>${cliente.email || ''}</td>
+                            <td>${cliente.telefone || ''}</td>
+                            <td><button class="btn btn-secundario btn-sm">Editar</button></td>
+                        `;
+                        tbody.appendChild(linha);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar clientes:', error);
+                });
+        }
+
+        carregarClientesTabela();
 
         formCliente.addEventListener('submit', function (e) {
             e.preventDefault();
-
-            const nome     = document.getElementById('nomeCliente').value.trim();
-            const cpf      = document.getElementById('cpfCliente').value.trim();
-            const email    = document.getElementById('emailCliente').value.trim();
+            const nome = document.getElementById('nomeCliente').value.trim();
+            const cpf = document.getElementById('cpfCliente').value.trim();
+            const email = document.getElementById('emailCliente').value.trim();
             const telefone = document.getElementById('telefoneCliente').value.trim();
 
             let erros = [];
-
             if (!nome) erros.push('Nome completo é obrigatório.');
-
             if (!cpf) {
                 erros.push('CPF é obrigatório.');
             } else if (!validarCPF(cpf)) {
                 erros.push('CPF inválido.');
             }
-
-            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            if (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
                 erros.push('E-mail inválido.');
             }
 
@@ -189,29 +242,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            const tbody = document.querySelector('#tabelaClientes tbody');
-            const vazia = tbody.querySelector('.tabela-vazia');
-            if (vazia) vazia.remove();
+            const cliente = { nomeCompleto: nome, cpf, email, telefone };
 
-            const linha = document.createElement('tr');
-            linha.innerHTML = `
-                <td>${nome}</td>
-                <td>${cpf}</td>
-                <td>${email}</td>
-                <td>${telefone}</td>
-                <td><button class="btn btn-secundario btn-sm">Editar</button></td>
-            `;
-            tbody.appendChild(linha);
-
-            // Salva no localStorage
-            const cliente = { nome, cpf, email, telefone };
-            const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
-            clientes.push(cliente);
-            localStorage.setItem('clientes', JSON.stringify(clientes));
-
-            msgCliente.textContent = 'Cliente cadastrado com sucesso!';
-            msgCliente.className = 'mensagem-sucesso';
-            formCliente.reset();
+            fetch(`${API_BASE_URL}/clientes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(cliente)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then(data => {
+                msgCliente.textContent = 'Cliente cadastrado com sucesso!';
+                msgCliente.className = 'mensagem-sucesso';
+                formCliente.reset();
+                carregarClientesTabela();
+            })
+            .catch(error => {
+                console.error('Erro ao cadastrar cliente:', error);
+                msgCliente.textContent = 'Erro ao cadastrar cliente: ' + (error.message || 'Erro desconhecido');
+                msgCliente.className = 'mensagem-erro';
+            });
         });
 
         if (btnLimparCliente) {
@@ -228,47 +282,52 @@ document.addEventListener('DOMContentLoaded', function () {
     // ==============================
     const btnAdicionarLivro = document.getElementById('btnAdicionarLivro');
     if (btnAdicionarLivro) {
+        let itensCarrinho = [];
 
         // Carrega clientes no select
         function carregarClientes() {
-            const selectCliente = document.getElementById('selectCliente');
-            if (!selectCliente) return;
-
-            const clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
-            selectCliente.innerHTML = '<option value="">Selecione um cliente</option>';
-
-            clientes.forEach((cliente, index) => {
-                const option = document.createElement('option');
-                option.value = index.toString();
-                option.textContent = `${cliente.nome} - CPF: ${cliente.cpf}`;
-                option.dataset.nome = cliente.nome;
-                option.dataset.cpf = cliente.cpf;
-                option.dataset.email = cliente.email;
-                option.dataset.telefone = cliente.telefone;
-                selectCliente.appendChild(option);
-            });
+            fetch(`${API_BASE_URL}/clientes`)
+                .then(response => response.json())
+                .then(clientes => {
+                    const selectCliente = document.getElementById('selectCliente');
+                    if (!selectCliente) return;
+                    selectCliente.innerHTML = '<option value="">Selecione um cliente</option>';
+                    clientes.forEach(cliente => {
+                        const option = document.createElement('option');
+                        option.value = cliente.id;
+                        option.textContent = `${cliente.nomeCompleto} - CPF: ${cliente.cpf}`;
+                        option.dataset.nome = cliente.nomeCompleto;
+                        option.dataset.cpf = cliente.cpf;
+                        option.dataset.email = cliente.email || '';
+                        option.dataset.telefone = cliente.telefone || '';
+                        selectCliente.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar clientes:', error));
         }
 
         // Carrega livros no select
         function carregarLivros() {
-            const selectLivro = document.getElementById('selectLivro');
-            if (!selectLivro) return;
-
-            const livros = JSON.parse(localStorage.getItem('livros') || '[]');
-            selectLivro.innerHTML = '<option value="">Selecione um livro</option>';
-
-            livros.forEach((livro, index) => {
-                const option = document.createElement('option');
-                option.value = index.toString();
-                option.textContent = `${livro.titulo} - ${formatarMoeda(livro.precoVenda)}`;
-                option.dataset.preco = livro.precoVenda.toString();
-                option.dataset.titulo = livro.titulo;
-                option.dataset.autor = livro.autor;
-                selectLivro.appendChild(option);
-            });
+            fetch(`${API_BASE_URL}/livros`)
+                .then(response => response.json())
+                .then(livros => {
+                    const selectLivro = document.getElementById('selectLivro');
+                    if (!selectLivro) return;
+                    selectLivro.innerHTML = '<option value="">Selecione um livro</option>';
+                    livros.forEach(livro => {
+                        const option = document.createElement('option');
+                        option.value = livro.id;
+                        option.textContent = `${livro.titulo} - ${formatarMoeda(livro.precoVenda)}`;
+                        option.dataset.preco = livro.precoVenda;
+                        option.dataset.titulo = livro.titulo;
+                        option.dataset.autor = livro.autor;
+                        option.dataset.estoque = livro.estoque;
+                        selectLivro.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar livros:', error));
         }
 
-        // Carrega livros e clientes ao iniciar
         carregarLivros();
         carregarClientes();
 
@@ -283,7 +342,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('emailVenda').value = selectedOption.dataset.email || '';
                     document.getElementById('telefoneVenda').value = selectedOption.dataset.telefone || '';
                 } else {
-                    // Limpa campos se nenhum cliente selecionado
                     document.getElementById('nomeVenda').value = '';
                     document.getElementById('cpfVenda').value = '';
                     document.getElementById('emailVenda').value = '';
@@ -292,12 +350,10 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        let itensCarrinho = [];
-
         function atualizarCarrinho() {
-            const lista    = document.getElementById('listaCarrinho');
-            const totalEl  = document.getElementById('totalCarrinho');
-            const qtdEl    = document.getElementById('qtdItensCarrinho');
+            const lista = document.getElementById('listaCarrinho');
+            const totalEl = document.getElementById('totalCarrinho');
+            const qtdEl = document.getElementById('qtdItensCarrinho');
 
             if (itensCarrinho.length === 0) {
                 lista.innerHTML = '<p class="tabela-vazia">Nenhum item adicionado.</p>';
@@ -306,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            let html  = '';
+            let html = '';
             let total = 0;
             itensCarrinho.forEach((item, idx) => {
                 const subtotal = item.preco * item.qtd;
@@ -334,57 +390,90 @@ document.addEventListener('DOMContentLoaded', function () {
 
         btnAdicionarLivro.addEventListener('click', function () {
             const selectLivro = document.getElementById('selectLivro');
-            const qtdInput    = document.getElementById('qtdLivro');
-
+            const qtdInput = document.getElementById('qtdLivro');
             limparErro('selectLivro');
             limparErro('qtdLivro');
 
             const livroOpt = selectLivro.options[selectLivro.selectedIndex];
-            const qtd      = parseInt(qtdInput.value);
+            const qtd = parseInt(qtdInput.value);
 
             let valido = true;
             if (!selectLivro.value) { mostrarErro('selectLivro', 'Selecione um livro.'); valido = false; }
             if (isNaN(qtd) || qtd < 1) { mostrarErro('qtdLivro', 'Quantidade mínima é 1.'); valido = false; }
+
             if (!valido) return;
 
             const preco = parseFloat(livroOpt.dataset.preco);
-            itensCarrinho.push({ nome: livroOpt.text.split(' - ')[0], preco, qtd });
-            atualizarCarrinho();
+            const livroId = parseInt(livroOpt.value);
+            const estoque = parseInt(livroOpt.dataset.estoque);
 
+            if (qtd > estoque) {
+                mostrarErro('qtdLivro', `Estoque insuficiente. Disponível: ${estoque}`);
+                return;
+            }
+
+            itensCarrinho.push({ 
+                livroId, 
+                nome: livroOpt.dataset.titulo, 
+                preco, 
+                qtd 
+            });
+            atualizarCarrinho();
             selectLivro.value = '';
-            qtdInput.value    = 1;
+            qtdInput.value = 1;
         });
 
         const btnFinalizar = document.getElementById('btnFinalizarVenda');
         if (btnFinalizar) {
             btnFinalizar.addEventListener('click', function () {
                 limparErro('selectCliente');
-
                 const selectCliente = document.getElementById('selectCliente');
+
                 if (!selectCliente.value) {
                     mostrarErro('selectCliente', 'Selecione um cliente antes de finalizar.');
                     return;
                 }
+
                 if (itensCarrinho.length === 0) {
                     mostrarAlerta('alertaVenda', 'erro', 'Adicione pelo menos um livro ao carrinho.');
                     return;
                 }
 
-                // Registra no histórico via localStorage
                 const venda = {
-                    cliente: selectCliente.options[selectCliente.selectedIndex].text,
-                    data: new Date().toLocaleDateString('pt-BR'),
-                    itens: itensCarrinho.length,
-                    total: itensCarrinho.reduce((acc, i) => acc + i.preco * i.qtd, 0)
+                    cliente: { id: parseInt(selectCliente.value) },
+                    itens: itensCarrinho.map(item => ({
+                        livro: { id: item.livroId },
+                        quantidade: item.qtd,
+                        precoUnitario: item.preco
+                    }))
                 };
-                const historico = JSON.parse(localStorage.getItem('historico') || '[]');
-                historico.push(venda);
-                localStorage.setItem('historico', JSON.stringify(historico));
 
-                mostrarAlerta('alertaVenda', 'sucesso', 'Venda finalizada com sucesso!');
-                itensCarrinho = [];
-                atualizarCarrinho();
-                document.getElementById('selectCliente').value = '';
+                fetch(`${API_BASE_URL}/vendas`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(venda)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    mostrarAlerta('alertaVenda', 'sucesso', 'Venda finalizada com sucesso!');
+                    itensCarrinho = [];
+                    atualizarCarrinho();
+                    selectCliente.value = '';
+                    document.getElementById('nomeVenda').value = '';
+                    document.getElementById('cpfVenda').value = '';
+                    document.getElementById('emailVenda').value = '';
+                    document.getElementById('telefoneVenda').value = '';
+                    carregarLivros();
+                })
+                .catch(error => {
+                    console.error('Erro ao finalizar venda:', error);
+                    mostrarAlerta('alertaVenda', 'erro', 'Erro ao finalizar venda: ' + (error.message || 'Erro desconhecido'));
+                });
             });
         }
 
@@ -394,6 +483,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 itensCarrinho = [];
                 atualizarCarrinho();
                 document.getElementById('selectCliente').value = '';
+                document.getElementById('nomeVenda').value = '';
+                document.getElementById('cpfVenda').value = '';
+                document.getElementById('emailVenda').value = '';
+                document.getElementById('telefoneVenda').value = '';
                 limparErro('selectCliente');
                 limparErro('selectLivro');
             });
@@ -405,47 +498,49 @@ document.addEventListener('DOMContentLoaded', function () {
     // ==============================
     const tabelaHistorico = document.getElementById('tabelaHistorico');
     if (tabelaHistorico) {
-
         function carregarHistorico(dataInicio, dataFim) {
-            const historico = JSON.parse(localStorage.getItem('historico') || '[]');
-            const tbody = tabelaHistorico.querySelector('tbody');
-            tbody.innerHTML = '';
+            let url = `${API_BASE_URL}/vendas`;
+            
+            if (dataInicio && dataFim) {
+                url += `/periodo?inicio=${dataInicio}T00:00:00&fim=${dataFim}T23:59:59`;
+            }
 
-            let filtrado = historico;
+            fetch(url)
+                .then(response => response.json())
+                .then(vendas => {
+                    const tbody = tabelaHistorico.querySelector('tbody');
+                    tbody.innerHTML = '';
 
-            if (dataInicio || dataFim) {
-                filtrado = historico.filter(v => {
-                    const partes = v.data.split('/');
-                    const dataVenda = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
-                    if (dataInicio && dataVenda < new Date(dataInicio)) return false;
-                    if (dataFim   && dataVenda > new Date(dataFim))   return false;
-                    return true;
+                    if (vendas.length === 0) {
+                        tbody.innerHTML = '<tr class="tabela-vazia"><td colspan="5">Nenhum registro encontrado.</td></tr>';
+                        return;
+                    }
+
+                    vendas.forEach(venda => {
+                        const data = new Date(venda.dataHora).toLocaleDateString('pt-BR');
+                        const linha = document.createElement('tr');
+                        linha.innerHTML = `
+                            <td>${venda.cliente.nomeCompleto}</td>
+                            <td>${data}</td>
+                            <td>${venda.itens.length}</td>
+                            <td>${formatarMoeda(venda.valorTotal)}</td>
+                            <td><button class="btn btn-secundario btn-sm">Ver Detalhes</button></td>
+                        `;
+                        tbody.appendChild(linha);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar histórico:', error);
+                    const tbody = tabelaHistorico.querySelector('tbody');
+                    tbody.innerHTML = '<tr class="tabela-vazia"><td colspan="5">Erro ao carregar dados.</td></tr>';
                 });
-            }
-
-            if (filtrado.length === 0) {
-                tbody.innerHTML = '<tr class="tabela-vazia"><td colspan="5">Nenhum registro encontrado.</td></tr>';
-                return;
-            }
-
-            filtrado.forEach(venda => {
-                const linha = document.createElement('tr');
-                linha.innerHTML = `
-                    <td>${venda.cliente}</td>
-                    <td>${venda.data}</td>
-                    <td>${venda.itens}</td>
-                    <td>${formatarMoeda(venda.total)}</td>
-                    <td><button class="btn btn-secundario btn-sm">Ver Detalhes</button></td>
-                `;
-                tbody.appendChild(linha);
-            });
         }
 
         carregarHistorico();
 
         // Filtros de data
         const filtroInicio = document.getElementById('filtroDataInicio');
-        const filtroFim    = document.getElementById('filtroDataFim');
+        const filtroFim = document.getElementById('filtroDataFim');
 
         if (filtroInicio) {
             filtroInicio.addEventListener('change', () => {
@@ -459,5 +554,4 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     }
-
 });

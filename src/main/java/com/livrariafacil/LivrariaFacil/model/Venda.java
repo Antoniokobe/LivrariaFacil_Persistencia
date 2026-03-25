@@ -18,7 +18,7 @@ public class Venda {
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
-    @Column(name = "data_venda", nullable = false)
+    @Column(name = "datavenda", nullable = false)
     private LocalDateTime dataVenda;
 
     @Column(name = "total", nullable = false, precision = 10, scale = 2)
